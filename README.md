@@ -3,7 +3,7 @@
 ## Schnellstart
 ```bash
 # 1) Node 18+ installieren
-# 2) Abhängigkeiten installieren
+# 2) Abhängigkeiten installieren:
 npm i
 
 # 3) Entwickeln
