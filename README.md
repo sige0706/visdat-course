@@ -1,3 +1,11 @@
+## Students
+
+### [Simon Gersdorfer]
+- **GitHub:** [@sige0706]
+- **Program:** Master Mechanical Engineering
+- **Interests:** muss ich noch herausfinden
+- **Background:** Matura, Lehrabschluss Maschinenbautechnik, FH Wels - Maschinenbaustudium
+
 # Visualisierung & Datenaufbereitung — Kurs-Site
 
 ## Schnellstart
