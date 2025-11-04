@@ -14,7 +14,7 @@ This section provides a comprehensive guide to data processing using pandas, Pyt
 
 This data processing module is organized into four focused documents:
 
-### 📊 [Pandas Fundamentals](./data-processing/pandas-fundamentals)
+### 📊 [Pandas Fundamentals](./pandas-fundamentals)
 **Core concepts and essential operations**
 - Data structures (Series and DataFrame)
 - Data loading and inspection
@@ -25,7 +25,7 @@ This data processing module is organized into four focused documents:
 
 *Start here if you're new to pandas or need a refresher on the fundamentals.*
 
-### 🚀 [High-Performance Data Storage with HDF5](./data-processing/hdf5-storage)
+### 🚀 [High-Performance Data Storage with HDF5](./hdf5-storage)
 **Managing large engineering datasets efficiently**
 - Understanding the big data challenge in engineering
 - HDF5 format advantages and use cases
@@ -36,7 +36,7 @@ This data processing module is organized into four focused documents:
 
 *Essential for working with large sensor datasets and long-term data archival.*
 
-### ⚡ [Advanced Pandas Operations](./data-processing/advanced-operations)
+### ⚡ [Advanced Pandas Operations](./advanced-operations)
 **Sophisticated analysis techniques**
 - Time series analysis and resampling
 - GroupBy operations for segment analysis
@@ -47,7 +47,7 @@ This data processing module is organized into four focused documents:
 
 *Master these techniques for complex engineering analysis workflows.*
 
-### 🏎️ [Racing Data Case Study](./data-processing/racing-case-study)
+### 🏎️ [Racing Data Case Study](./racing-case-study)
 **Complete workflow example with vehicle dynamics**
 - End-to-end analysis of racing telemetry data
 - Data quality assessment and validation
