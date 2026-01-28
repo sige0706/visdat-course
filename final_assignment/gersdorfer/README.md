@@ -1,123 +1,60 @@
+# FFT Analyse Tool für LabVIEW-Messdaten
+
+## Projektbeschreibung
+
+Dieses Projekt ist ein Analyse-Tool zur Auswertung von Messdaten aus LabVIEW.  
+Es ermöglicht das Einlesen zeitdiskreter Messsignale (z. B. Beschleunigung und Kraft), die Berechnung der Übertragungsfunktion mittels FFT, sowie deren grafische Darstellung und den Export ausgewählter Signale.
+
+Ziel des Projekts ist es, eine GUI-gestützte Auswertungsumgebung zu schaffen, in der Messdaten interaktiv analysiert und berechnete Daten strukturiert exportiert und anschließend weiterverwendet werden können.
+
+---
+
+## Features
+
+- Einlesen von Messdaten aus CSV-Dateien (LabVIEW-Export)
+- Konfigurierbare CSV-Struktur (Header-Zeilen, Spaltennamen)
+- FFT-basierte Berechnung der Übertragungsfunktion
+- Darstellung des Betrags der Übertragungsfunktion
+- Vergleich des Imaginärteils zur Plausibilitätsprüfung  
+  (FFT-Ergebnis vs. Referenzdaten aus LabVIEW)
+- Eingebettete Matplotlib-Plots in einer PyQt6-GUI
+- Interaktive Plot-Navigation
+- Export frei wählbarer Signale als CSV-Datei
+
+---
+
+## Verwendete Technologien
+
+- **NumPy** – numerische Berechnungen, FFT-Auswertung
+- **Pandas** – Einlesen und Verarbeiten von CSV-Daten
+- **Matplotlib** – Visualisierung der Analyseergebnisse
+- **PyQt6** – grafische Benutzeroberfläche
+
+---
+
+## Installation & Setup
+
+```bash
+cd final-assignment/gersdorfer/code
+pip install -r requirements.txt
+```
+
+---
+
+## Daten
 
 
+Das Projekt verarbeitet zeitdiskrete Messdaten aus LabVIEW, die als CSV-Dateien exportiert wurden.  
+Die Dateien befinden sich im Ordner `code/data/`
 
-def plot_acceleration_time(acc, fs):
-    t = np.arange(len(acc)) / fs
+Header-Zeilen und relevante Spalten (Acceleration, Force, ...) sind über die GUI frei konfigurierbar.
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(t, acc)
-    plt.xlabel("Zeit [s]")
-    plt.ylabel("Beschleunigung")
-    plt.title("Beschleunigung über Zeit")
-    plt.grid(True)
-    plt.show()
+---
 
+## Implementation Details
 
-def plot_force_time(force, fs):
-    t = np.arange(len(force)) / fs
-
-    plt.figure(figsize=(10, 5))
-    plt.plot(t, force)
-    plt.xlabel("Zeit [s]")
-    plt.ylabel("Kraft")
-    plt.title("Kraft über Zeit")
-    plt.grid(True)
-    plt.show()
-
-
-
-    
-
-#Plottet den Betrag der Übertragungsfunktion |H(f)|
-#def plot_transfer_function(freq, H, f_max, title):
-    
-#    f_range = (freq >= 0) & (freq <= f_max)
-
-#    plt.figure(figsize=(10, 5))
-#    plt.plot(freq[f_range], np.abs(H[f_range]))
-#    plt.xlabel("Frequenz")
-#    plt.ylabel("Amplitude")
-#    plt.title(title)
-#    plt.grid(True)
-#    #plt.tight_layout()
-#    plt.show()
-
-
-
-
-#Vergleich Imaginärteil FFT vs. LabVIEW
-
-#def plot_imaginary_comparison(freq, H, freq_imag, f_max):
-
-#    f_range = (freq >= 0) & (freq <= f_max)
-
-#    H_imag = np.imag(H)             #Imaginärteil Ü-Funktion
-
-#    plt.figure(figsize=(10, 5))
-#    plt.plot(freq[f_range], freq_imag[f_range], label="Imaginärteil (CSV / LabVIEW)")
-#    plt.plot(freq[f_range], H_imag[f_range], "--", label="Imaginärteil (FFT)")
-#    plt.xlabel("Frequenz")
-#    plt.ylabel("Im")
-#    plt.title("Vergleich der berechneten Imagiärteile und der im LabVIEW abgespeicherten Imaginärteile")
-#    plt.legend()
-#    plt.grid(True)
-#    #plt.tight_layout()
-#    plt.show()
-
-
-
-#import numpy as np
-#import matplotlib.pyplot as plt
-
-
-#def create_transfer_function_plot(freq, H, f_max, a_max):
-#    fig, ax = plt.subplots(figsize=(10, 5))
-
-#    line, = ax.plot(freq, np.abs(H))
-
-#    ax.set_xlim(0, f_max)
-#    ax.set_ylim(0, a_max)
-#    ax.set_xlabel("Frequenz [Hz]")
-#    ax.set_ylabel("Amplitude")
-#    ax.set_title("Übertragungsfunktion |H(f)|")
-#    ax.grid(True)
-
-#    plt.show(block=False)
-
-#    return fig, ax
-
-
-#def update_limits(ax, fig, f_max, a_max):
-#    ax.set_xlim(0, f_max)
-#    ax.set_ylim(0, a_max)
-#    fig.canvas.draw_idle()
-
-
-
-
-
-#import numpy as np
-#import matplotlib.pyplot as plt
-
-
-#def create_transfer_function_plot(freq, H, f_max):
-#    fig, ax = plt.subplots(figsize=(10, 5))
-
-#    ax.plot(freq, np.abs(H))
-
-#    ax.set_xlim(0, f_max)
-#    ax.set_xlabel("Frequenz [Hz]")
-#    ax.set_ylabel("Amplitude")
-#    ax.set_title("Übertragungsfunktion |H(f)|")
-#    ax.grid(True)
-
-#    plt.show(block=False)
-
-#    return fig, ax
-
-
-#def update_limits(ax, fig, f_max):
-#    ax.set_xlim(0, f_max)
-#    fig.canvas.draw_idle()
+- Die Übertragungsfunktion wird als Quotient der FFT von Beschleunigung und Kraft berechnet.  
+- Alle Funktionen sind in eigenen Modulen
+- Der CSV-Export ist so aufgebaut, sodass beliebige Signale ausgewählt, benannt und gespeichert werden können.
 
 

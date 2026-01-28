@@ -1,42 +1,82 @@
-from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout,
-    QPushButton, QLabel, QFileDialog, QLineEdit, QMessageBox
-)
-
-from matplotlib.backends.backend_qtagg import (
-    FigureCanvasQTAgg,
-    NavigationToolbar2QT
-)
+# Standard-Bibliotheken
 
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),'source')))
 
-from matplotlib.figure import Figure
+#Third-Party Bibliotheken
 import numpy as np
 
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QLineEdit, QMessageBox)
+
+from matplotlib.backends.backend_qtagg import (FigureCanvasQTAgg, NavigationToolbar2QT)
+
+from matplotlib.figure import Figure
 
 
+# ============================================================
+# Projektpfade
+# ============================================================
+
+#Basisverzeichnis (dient zur Vermeidung von Absolutpfaden)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))      #Bestimmung des Basisverzeichnis
+
+# Python-Module (Datenverarbeitung/PLots etc.)
+SOURCE_DIR = os.path.join(BASE_DIR, "source")
+sys.path.insert(0, SOURCE_DIR)       #Zugriff auf meine Module/Funktionen in Source
+
+
+# ============================================================
+# Eigene Module importieren
+# ============================================================
 import data_loader as dl
 import signal_processing as sp
 from export_dialog import ExportCSVDialog
+import plotter as plo
 
+
+
+# ============================================================
+# GUI-Hauptfenster
+# ============================================================
 
 class MainWindow(QMainWindow):
+
+    #Hauptfenster der FFT-Analyse-Anwendung.
+
+    #Aufgaben:
+    #- Einlesen von CSV-Messdaten
+    #- Konfiguration der Analyseparameter
+    #- Berechnung der Übertragungsfunktion (FFT)
+    #- Darstellung der Ergebnisse in einem eingebetteten Matplotlib-Plot
+    #- Export ausgewählter Signale als CSV
+    
+
+
     def __init__(self):
         super().__init__()
+
+        # -----------------------------
+        # Fenster-Einstellungen
+        # -----------------------------
         self.setWindowTitle("FFT Analyse Tool")
         self.resize(1000, 700)
 
+        # Aktuell ausgewählte Datei
         self.file_path = None
+
+        # Speicher für exportierbare Signale
         self.available_signals = None
 
-        # ---------- Zentrales Widget ----------
+        # -----------------------------
+        # Zentrales Widget & Layout
+        # -----------------------------
         central = QWidget()
         self.setCentralWidget(central)
         layout = QVBoxLayout(central)
 
-        # ---------- Datei ----------
+        # -----------------------------
+        # Dateiauswahl
+        # -----------------------------
         self.label = QLabel("Keine Datei ausgewählt")
         layout.addWidget(self.label)
 
@@ -44,7 +84,9 @@ class MainWindow(QMainWindow):
         btn_open.clicked.connect(self.open_file)
         layout.addWidget(btn_open)
 
-        # ---------- Parameter ----------
+        # -----------------------------
+        # Analyseparameter
+        # -----------------------------
         layout.addWidget(QLabel("Samplingfrequenz [Hz]:"))
         self.fs_input = QLineEdit("12800")
         layout.addWidget(self.fs_input)
@@ -65,7 +107,9 @@ class MainWindow(QMainWindow):
         self.imag_input = QLineEdit("Untitled")
         layout.addWidget(self.imag_input)
 
-        # ---------- Buttons ----------
+        # -----------------------------
+        # Aktions-Buttons
+        # -----------------------------
         btn_plot = QPushButton("Übertragungsfunktion plotten")
         btn_plot.clicked.connect(self.run_analysis)
         layout.addWidget(btn_plot)
@@ -75,7 +119,9 @@ class MainWindow(QMainWindow):
         self.btn_export.clicked.connect(self.export_csv)
         layout.addWidget(self.btn_export)
 
-        # ---------- Plot ----------
+        # -----------------------------
+        # Matplotlib-Plot (eingebettet)
+        # -----------------------------
         self.figure = Figure(figsize=(6, 4))
         self.canvas = FigureCanvasQTAgg(self.figure)
         layout.addWidget(self.canvas)
@@ -83,9 +129,13 @@ class MainWindow(QMainWindow):
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
         layout.addWidget(self.toolbar)
 
-        self.ax = self.figure.add_subplot(111)
+        self.ax = self.figure.add_subplot(111)  # Achse für alle Plots
 
-    # ---------- Datei auswählen ----------
+    # ========================================================
+    # Datei-Auswahl
+    # ========================================================
+    #Öffnet einen Fenster zur Auswahl einer CSV-Messdatei
+
     def open_file(self):
         self.file_path, _ = QFileDialog.getOpenFileName(
             self,
@@ -96,12 +146,20 @@ class MainWindow(QMainWindow):
         if self.file_path:
             self.label.setText(self.file_path)
 
-    # ---------- Analyse ----------
+     # ========================================================
+    # Analyse & Plot
+    # ========================================================
+
+    #Führt die FFT-Analyse durch und stellt die Übertragungsfunktion dar.
     def run_analysis(self):
         if not self.file_path:
             QMessageBox.warning(self, "Fehler", "Bitte zuerst eine Datei auswählen.")
             return
 
+
+        # -----------------------------
+        # Parameter aus GUI lesen
+        # -----------------------------
         try:
             fs = float(self.fs_input.text())
             header_rows = int(self.header_input.text())
@@ -112,6 +170,10 @@ class MainWindow(QMainWindow):
         acc_col = self.acc_input.text()
         force_col = self.force_input.text()
         imag_col = self.imag_input.text()
+
+        # -----------------------------
+        # Daten einlesen
+        # -----------------------------
 
         try:
             freq_imag, acc, force = dl.load_measurement_csv(
@@ -125,12 +187,19 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Ladefehler", str(e))
             return
 
+
+        # -----------------------------
+        # Signalverarbeitung
+        # -----------------------------
+        
         freq, H = sp.compute_fft(acc, force, fs)
 
-        # Zeitachse
+        # Zeitachse (für Export)
         time = np.arange(len(acc)) / fs
 
-        # ---------- verfügbare Signale ----------
+        # -----------------------------
+        # Exportierbare Signale sammeln
+        # -----------------------------
         self.available_signals = {
             "time": time,
             "frequency": freq,
@@ -142,19 +211,16 @@ class MainWindow(QMainWindow):
             "H_imag": np.imag(H),
         }
 
-        # ---------- Plot ----------
-        self.ax.clear()
-        self.ax.plot(freq, np.abs(H))
-        self.ax.set_xlim(0, 40)
-        self.ax.set_xlabel("Frequenz [Hz]")
-        self.ax.set_ylabel("Amplitude")
-        self.ax.set_title("Übertragungsfunktion |H(f)|")
-        self.ax.grid(True)
+        # -----------------------------
+        # Plot aktualisieren
+        # -----------------------------
+        plo.plot_transfer_function(self.ax, freq, H, f_max=40, title="Übertragungsfunktion |H(f)|")
         self.canvas.draw()
-
         self.btn_export.setEnabled(True)
 
-    # ---------- CSV Export ----------
+    # ========================================================
+    # CSV Export
+    # ========================================================
     def export_csv(self):
         if not self.available_signals:
             return
@@ -162,6 +228,10 @@ class MainWindow(QMainWindow):
         dialog = ExportCSVDialog(self.available_signals, self)
         dialog.exec()
 
+
+# ============================================================
+# Programmstart
+# ============================================================
 
 if __name__ == "__main__":
     app = QApplication([])
